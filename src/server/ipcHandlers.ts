@@ -1,27 +1,37 @@
 import { ipcMain } from 'electron';
 import Libp2p from 'libp2p';
+import { createFromB58String } from 'peer-id';
 import { multiaddr } from 'multiaddr';
-import { PeerId } from 'libp2p/dist/src/content-routing/utils';
 import { IpcEvents } from '../resources/ipcEvents';
+import { initChatMessageHandler } from './pubsub/handlers';
 
 export const initIpcHandlers = (node: Libp2p) => {
   ipcMain.on(IpcEvents.RENDERED_READY, async (event) => {
     event.reply(
       IpcEvents.NODE_READY,
-      node.multiaddrs.map((address) => {
-        return `${address.toString()}/p2p/${node.peerId.toB58String()}`;
+      JSON.stringify({
+        address: node.multiaddrs[0].toString(),
+        peerId: node.peerId.toB58String(),
       })
     );
   });
 
-  ipcMain.on(IpcEvents.PEER_CONNECT_INIT, async (event, peerPath: string) => {
-    const peerId = multiaddr(peerPath).getPeerId();
+  ipcMain.on(IpcEvents.PEER_CONNECT_INIT, async (event, addr: string) => {
+    let { peerId, address } = JSON.parse(addr);
 
-    if (!peerId) {
-      return event.reply(IpcEvents.PEER_CONNECTION_FAILED);
+    try {
+      peerId = createFromB58String(peerId);
+      address = multiaddr(address);
+
+      node.peerStore.addressBook.set(peerId, [address]);
+
+      await node.dial(peerId);
+    } catch (err: any) {
+      return event.reply(IpcEvents.PEER_CONNECTION_FAILED, err.message);
     }
 
-    await node.peerRouting.findPeer(peerId as unknown as PeerId);
-    event.reply();
+    event.reply(IpcEvents.PEER_CONNECTED);
+
+    await initChatMessageHandler(node, event.reply.bind(event));
   });
 };

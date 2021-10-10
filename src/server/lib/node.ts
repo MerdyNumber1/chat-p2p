@@ -2,7 +2,7 @@ import Libp2p from 'libp2p';
 import { NOISE } from '@chainsafe/libp2p-noise';
 import WebSockets from 'libp2p-websockets';
 import MPLEX from 'libp2p-mplex';
-import DelegatedPeerRouter from 'libp2p-delegated-peer-routing';
+import Gossipsub from 'libp2p-gossipsub';
 import { logger } from './logger';
 
 export const startNode = async (): Promise<Libp2p> => {
@@ -14,7 +14,7 @@ export const startNode = async (): Promise<Libp2p> => {
       transport: [WebSockets],
       connEncryption: [NOISE],
       streamMuxer: [MPLEX],
-      peerRouting: [DelegatedPeerRouter],
+      pubsub: Gossipsub,
     },
   });
 

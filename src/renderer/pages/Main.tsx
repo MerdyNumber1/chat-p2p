@@ -13,9 +13,10 @@ export const Main: React.VFC = () => {
   useEffect(() => {
     window.electron.ipcRenderer.on(
       IpcEvents.NODE_READY,
-      (_: void, pids: string[]) => {
+      (_: void, addr: string) => {
+        const { peerId, address } = JSON.parse(addr);
         setIsNodeReady(true);
-        history.push(`/connect?pid=${pids[0]}`);
+        history.push(`/connect?pid=${peerId}&address=${address}`);
       }
     );
 
