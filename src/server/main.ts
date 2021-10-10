@@ -1,10 +1,7 @@
-import express from 'express';
-import { createNode } from './node';
+import { startNode } from './lib/node';
+import { initIpcHandlers } from './ipcHandlers';
 
-const app = express();
-
-export const run = () => {
-  createNode();
-  app.get('', (_, res) => res.send('hello world!'));
-  app.listen(3000, () => console.log('listening on port 3000!'));
+export const run = async () => {
+  const node = await startNode();
+  initIpcHandlers(node);
 };
