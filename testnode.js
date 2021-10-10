@@ -3,7 +3,7 @@ const WebSockets = require('libp2p-websockets');
 const { NOISE } = require('@chainsafe/libp2p-noise');
 const MPLEX = require('libp2p-mplex');
 const Gossipsub = require('libp2p-gossipsub');
-const { fromString } = require('uint8arrays');
+const { fromString, toString } = require('uint8arrays');
 
 const main = async () => {
   const node = await Libp2p.create({
@@ -25,10 +25,14 @@ const main = async () => {
     })
   );
 
-  await node.pubsub.subscribe('incoming_chat_message');
+  node.pubsub.on('chat_message', (msg) => {
+    console.log(toString(msg.data));
+  });
+
+  await node.pubsub.subscribe('chat_message');
   setInterval(() => {
     node.pubsub.publish(
-      'incoming_chat_message',
+      'chat_message',
       fromString('Bird bird bird, bird is the word!')
     );
   }, 1000);

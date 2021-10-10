@@ -9,8 +9,17 @@ export const initChatMessageHandler = async (
   reply: IpcMainEvent['reply']
 ) => {
   node.pubsub.on(Topics.CHAT_MESSAGE, (msg) => {
-    console.log(uint8ArrayToString(msg.data));
-    reply(IpcEvents.INCOMING_CHAT_MESSAGE, uint8ArrayToString(msg.data));
+    reply(IpcEvents.CHAT_INCOMING_MESSAGE, uint8ArrayToString(msg.data));
   });
+
   await node.pubsub.subscribe(Topics.CHAT_MESSAGE);
+};
+
+export const initPeerHandlers = async (
+  node: Libp2p,
+  reply: IpcMainEvent['reply']
+) => {
+  node.connectionManager.on('peer:disconnect', () => {
+    reply(IpcEvents.PEER_DISCONNECTED);
+  });
 };

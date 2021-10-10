@@ -1,27 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Button, Center, Heading, Input, Text, Alert } from '@chakra-ui/react';
 import { useHistory } from 'react-router';
-import { useQuery } from '../hooks/useQuery';
 import { IpcEvents } from '../../resources/ipcEvents';
+import { NodeContext } from '../providers/nodeContext';
 
 export const Connect: React.VFC = () => {
   const [connectionPeerId, setConnectionPeerId] = useState<string>();
   const [connectionAddress, setConnectionAddress] = useState<string>();
   const [connectionError, setConnectionError] = useState<string>();
+  const { peerId, address } = useContext(NodeContext);
   const history = useHistory();
-  const pid = useQuery().get('pid');
-  const address = useQuery().get('address');
 
   useEffect(() => {
-    window.electron.ipcRenderer.on(IpcEvents.PEER_CONNECTED, () => {
+    const peerConnectedListener = () => {
       history.push('/chat');
-    });
+    };
+    const peerConnectionFailedListener = (_: void, error: string) => {
+      setConnectionError(error);
+    };
+
+    window.electron.ipcRenderer.on(
+      IpcEvents.PEER_CONNECTED,
+      peerConnectedListener
+    );
     window.electron.ipcRenderer.on(
       IpcEvents.PEER_CONNECTION_FAILED,
-      (_: void, error: string) => {
-        setConnectionError(error);
-      }
+      peerConnectionFailedListener
     );
+
+    return () => {
+      window.electron.ipcRenderer.removeListener(IpcEvents.PEER_CONNECTED);
+      window.electron.ipcRenderer.removeListener(
+        IpcEvents.PEER_CONNECTION_FAILED
+      );
+    };
   }, []);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,12 +53,14 @@ export const Connect: React.VFC = () => {
     setConnectionAddress(e.target.value);
   };
 
+  // убрать все обработчики событий при анмаунте на фронте и беке
+
   return (
     <div>
       <Heading mb={4} size="lg">
         Your peer id:
       </Heading>
-      <Text>{pid}</Text>
+      <Text>{peerId}</Text>
       <Heading my={4} size="lg">
         Your address:
       </Heading>

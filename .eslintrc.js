@@ -8,6 +8,10 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'off',
     'consistent-return': 'off',
     'prefer-const': 'off',
+    'react/no-array-index-key': 'off',
+    'no-nested-ternary': 'off',
+    'jsx-a11y/anchor-is-valid': 'off',
+    'react/jsx-props-no-spreading': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
