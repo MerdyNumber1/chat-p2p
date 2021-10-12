@@ -10,6 +10,10 @@ declare module 'libp2p-delegated-peer-routing' {
   const DelegatedPeerRouter: any;
   export default DelegatedPeerRouter;
 }
+declare module 'uri-to-multiaddr' {
+  const toMultiaddr: any;
+  export default toMultiaddr;
+}
 declare module '*.svg' {
   const content: any;
   export default content;

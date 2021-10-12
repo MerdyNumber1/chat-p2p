@@ -9,7 +9,8 @@ import { NodeContext } from '../providers/nodeContext';
 export const Main: React.VFC = () => {
   const [isNodeReady, setIsNodeReady] = useState<boolean>(false);
   const [peerId, setPeerId] = useState('');
-  const [address, setAddress] = useState('');
+  const [localAddress, setLocalAddress] = useState('');
+  const [remoteAddress, setRemoteAddress] = useState('');
 
   const history = useHistory();
 
@@ -17,9 +18,16 @@ export const Main: React.VFC = () => {
     window.electron.ipcRenderer.on(
       IpcEvents.NODE_READY,
       (_: void, addr: string) => {
-        const { peerId: nodePeerId, address: nodeAddress } = JSON.parse(addr);
+        const {
+          peerId: nodePeerId,
+          localAddress: nodeLocalAddress,
+          remoteAddress: nodeRemoteAddress,
+        } = JSON.parse(addr);
+
         setPeerId(nodePeerId);
-        setAddress(nodeAddress);
+        setLocalAddress(nodeLocalAddress);
+        setRemoteAddress(nodeRemoteAddress);
+
         setIsNodeReady(true);
         history.push(`/connect`);
       }
@@ -29,8 +37,15 @@ export const Main: React.VFC = () => {
   }, []);
 
   const nodeContextValue = useMemo(
-    () => ({ peerId, setPeerId, address, setAddress }),
-    [peerId, address]
+    () => ({
+      peerId,
+      setPeerId,
+      localAddress,
+      setLocalAddress,
+      remoteAddress,
+      setRemoteAddress,
+    }),
+    [peerId, localAddress, remoteAddress]
   );
 
   return isNodeReady ? (

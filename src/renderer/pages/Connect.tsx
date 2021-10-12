@@ -8,7 +8,7 @@ export const Connect: React.VFC = () => {
   const [connectionPeerId, setConnectionPeerId] = useState<string>();
   const [connectionAddress, setConnectionAddress] = useState<string>();
   const [connectionError, setConnectionError] = useState<string>();
-  const { peerId, address } = useContext(NodeContext);
+  const { peerId, localAddress, remoteAddress } = useContext(NodeContext);
   const history = useHistory();
 
   useEffect(() => {
@@ -53,8 +53,6 @@ export const Connect: React.VFC = () => {
     setConnectionAddress(e.target.value);
   };
 
-  // убрать все обработчики событий при анмаунте на фронте и беке
-
   return (
     <div>
       <Heading mb={4} size="lg">
@@ -62,9 +60,13 @@ export const Connect: React.VFC = () => {
       </Heading>
       <Text>{peerId}</Text>
       <Heading my={4} size="lg">
-        Your address:
+        Your local address:
       </Heading>
-      <Text>{address}</Text>
+      <Text>{localAddress}</Text>
+      <Heading my={4} size="lg">
+        Your remote address:
+      </Heading>
+      <Text>{remoteAddress}</Text>
       <Center>
         <Heading size="lg">or</Heading>
       </Center>

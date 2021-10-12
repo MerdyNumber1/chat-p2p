@@ -1,5 +1,7 @@
 import { ipcMain } from 'electron';
 import Libp2p from 'libp2p';
+import * as ngrok from 'ngrok';
+import toMultiaddr from 'uri-to-multiaddr';
 import { createFromB58String } from 'peer-id';
 import { fromString as uint8ArrayFromString } from 'uint8arrays';
 import { multiaddr } from 'multiaddr';
@@ -9,10 +11,18 @@ import { Topics } from './pubsub/topics';
 
 export const initIpcHandlers = (node: Libp2p) => {
   ipcMain.on(IpcEvents.RENDERED_READY, async (event) => {
+    const remoteAddress = toMultiaddr(
+      await ngrok.connect({
+        binPath: (path: string) =>
+          path.replace('app.asar', 'app.asar.unpacked'),
+      })
+    );
+
     event.reply(
       IpcEvents.NODE_READY,
       JSON.stringify({
-        address: node.multiaddrs[0].toString(),
+        localAddress: node.multiaddrs[0].toString(),
+        remoteAddress: remoteAddress.toString(),
         peerId: node.peerId.toB58String(),
       })
     );

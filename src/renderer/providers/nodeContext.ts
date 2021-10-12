@@ -2,7 +2,9 @@ import { createContext } from 'react';
 
 export const NodeContext = createContext({
   peerId: '',
-  address: '',
+  localAddress: '',
+  remoteAddress: '',
   setPeerId: () => {},
-  setAddress: () => {},
+  setLocalAddress: () => {},
+  setRemoteAddress: () => {},
 });

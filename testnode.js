@@ -3,9 +3,15 @@ const WebSockets = require('libp2p-websockets');
 const { NOISE } = require('@chainsafe/libp2p-noise');
 const MPLEX = require('libp2p-mplex');
 const Gossipsub = require('libp2p-gossipsub');
+const ngrok = require('ngrok');
+const toMultiaddr = require('uri-to-multiaddr');
 const { fromString, toString } = require('uint8arrays');
 
 const main = async () => {
+  const url = await ngrok.connect();
+  console.log(url);
+  console.log('or');
+  console.log(toMultiaddr(url));
   const node = await Libp2p.create({
     addresses: {
       listen: ['/ip4/127.0.0.1/tcp/8080/ws'],
